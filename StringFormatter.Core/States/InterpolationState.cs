@@ -1,4 +1,5 @@
-﻿using StringFormatter.Core.States.Base;
+﻿using StringFormatter.Core.Interpolation;
+using StringFormatter.Core.States.Base;
 
 namespace StringFormatter.Core.States;
 
