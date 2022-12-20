@@ -24,7 +24,7 @@ namespace StringFormatter.Tests
         }
 
         [TestMethod]
-        public void Format_UseFakeClass_ReturnsNormalData()
+        public void Format_UseFakeClass_NormalData()
         {
             var s = Core.StringFormatter.Shared.Format("Static text is {StaticText}. {IntValueField} = 12.", _fakeClass);
 
@@ -37,13 +37,6 @@ namespace StringFormatter.Tests
             var s = Core.StringFormatter.Shared.Format("{{StaticText}}{{}}", _fakeClass);
 
             Assert.AreEqual("{StaticText}{}", s);
-        }
-
-        [TestMethod]
-        public void Format_TargetIsNull_Exception()
-        {
-            Assert.ThrowsException<ArgumentNullException>(() => Core.StringFormatter.Shared.Format("{Property}", null));
-            Assert.ThrowsException<ArgumentNullException>(() => Core.StringFormatter.Shared.Format(null, new object()));
         }
 
         [TestMethod]
@@ -69,6 +62,49 @@ namespace StringFormatter.Tests
             var s2 = Core.StringFormatter.Shared.Format("{ArrayProperty[1].Data}", _fakeClass);
             Assert.AreEqual(_fakeClass.ArrayProperty[0].Data.ToString(), s1);
             Assert.AreEqual(_fakeClass.ArrayProperty[1].Data.ToString(), s2);
+        }
+
+        [TestMethod]
+        public void Format_TargetIsNull_Exception()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => Core.StringFormatter.Shared.Format("{Property}", null));
+            Assert.ThrowsException<ArgumentNullException>(() => Core.StringFormatter.Shared.Format(null, new object()));
+        }
+
+        [TestMethod]
+        public void Format_DifferentNumberOfCurlyBrackets_Exception()
+        {
+            Assert.ThrowsException<InvalidOperationException>(() => 
+                Core.StringFormatter.Shared.Format("Static text is {{StaticText}.", _fakeClass));
+            Assert.ThrowsException<InvalidOperationException>(() => 
+                Core.StringFormatter.Shared.Format("Static text is {StaticText}}.", _fakeClass));
+        }
+        
+        [TestMethod]
+        public void Format_DifferentNumberOfSquareBrackets_Exception()
+        {
+            Assert.ThrowsException<InvalidOperationException>(() =>
+                Core.StringFormatter.Shared.Format("{ArrayProperty[0}", _fakeClass));
+        }
+
+        [TestMethod]
+        public void Format_IndexWithoutProperty_Exception()
+        {
+            Assert.ThrowsException<ArgumentException>(() =>
+                Core.StringFormatter.Shared.Format("{[0]}", _fakeClass));
+        }
+
+        [TestMethod]
+        public void Format_InvalidPropertyPath_Exception()
+        {
+            Assert.ThrowsException<ArgumentException>(() =>
+                Core.StringFormatter.Shared.Format("{ArrayProperty.Data}", _fakeClass));
+        }
+
+        [TestMethod]
+        public void Format_ArrayIndexNotANumber_Exception()
+        {
+            Assert.ThrowsException<InvalidOperationException>(() => Core.StringFormatter.Shared.Format("{ArrayProperty[first]}", _fakeClass));
         }
     }
 }
